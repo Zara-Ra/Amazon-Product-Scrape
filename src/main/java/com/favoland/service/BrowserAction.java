@@ -1,18 +1,24 @@
 package com.favoland.service;
 
 import com.favoland.data.AmazonProduct;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class BrowserAction {
     private static final String CHROME_DRIVER_PATH = "Driver\\chromedriver.exe";
+    public static final String IMAGE_FOLDER = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap";
+
     private static final BrowserAction browserAction = new BrowserAction();
 
     private BrowserAction() {
@@ -84,20 +90,20 @@ public class BrowserAction {
                                 countryOfOrigin = split[1];
                             }
                         }
-                    } catch (NoSuchElementException e){
+                    } catch (NoSuchElementException e) {
                         List<WebElement> rows = driver.findElements(By.cssSelector("table#productDetails_detailBullets_sections1 tr"));
                         for (WebElement row : rows) {
                             List<WebElement> cells = row.findElements(By.tagName("td"));
                             if (row.getText().contains("ASIN")) {
                                 String[] s = cells.get(0).getText().split(" ");
                                 asinValue = s[0];
-                            }
-                            else if (row.getText().contains("Manufacturer")) {
+                            } else if (row.getText().contains("Manufacturer")) {
                                 String[] s = cells.get(0).getText().split(" ");
                                 company = s[0];
                             }
                         }
                     }
+                    saveProductImages(driver, asinValue);
                     AmazonProduct product = AmazonProduct.builder()
                             .ASIN(asinValue)
                             .productName(productName)
@@ -121,5 +127,36 @@ public class BrowserAction {
             return productsList;
         }
 
+    }
+
+    public void saveProductImages(WebDriver driver, String ASIN) {
+        for (int i = 5; i < 13; i++) {
+            try {
+                WebElement element = driver.findElement(By.cssSelector("input[aria-labelledby='a-autoid-" + i + "-announce']"));
+
+                element.click();
+                TimeUnit.SECONDS.sleep(2);
+
+                WebElement imageElement = driver.findElement(By.id("landingImage"));
+                String imageUrl = imageElement.getAttribute("src");
+                if (imageUrl != null) {
+                    URL imgUrl = new URL(imageUrl);
+                    Path destination = Path.of(IMAGE_FOLDER, "image_" + ASIN + "_" + i + ".jpg");
+                    Files.copy(imgUrl.openStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("Downloaded image " + i + " to " + destination.toString());
+                }
+
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchElementException e) {
+                System.out.println("No more images available for this product...");
+            } catch (ElementNotInteractableException e){
+                System.out.println("Catched the exception, continue...");
+            }
+        }
     }
 }

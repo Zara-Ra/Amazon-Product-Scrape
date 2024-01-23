@@ -23,8 +23,8 @@ public class ExcelAction {
         return EXCEL_ACTION;
     }
 
-    public static final String URL_LIST = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap\\HandSoapURL.xlsx";
-    public static final String SCRAPE_PRODUCT_FILE_PATH = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap\\ScrapedHandSoap.xlsx";
+    public static final String URL_LIST = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap\\Testt.xlsx";
+    public static final String SCRAPE_PRODUCT_FILE_PATH = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap\\ScrapedTest.xlsx";
 
     public List<String> readURLs(){
         List<String> allURLs = new ArrayList<>();
@@ -42,7 +42,6 @@ public class ExcelAction {
 
                 String URL = amountCell.getStringCellValue();
                 allURLs.add(URL);
-                System.out.println(rowNum);
             }
             workbook.close();
         } catch (IOException e) {
