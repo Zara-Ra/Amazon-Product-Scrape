@@ -1,0 +1,13 @@
+<configuration debuge="false">
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>C:\Users\Hosseini\IdeaProjects\AmazonScrape\Logs\app.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %-5level - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>

@@ -11,6 +11,7 @@ public class Robot {
     private static final BrowserAction browserAction = BrowserAction.getInstance();
     private static final ExcelAction excelAction = ExcelAction.getInstance();
 
+
     public static void main(String[] args) {
 
         long startTime = System.currentTimeMillis();

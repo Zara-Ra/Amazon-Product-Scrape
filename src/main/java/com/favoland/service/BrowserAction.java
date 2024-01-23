@@ -1,8 +1,11 @@
 package com.favoland.service;
 
 import com.favoland.data.AmazonProduct;
+import com.favoland.run.Robot;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -18,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 public class BrowserAction {
     private static final String CHROME_DRIVER_PATH = "Driver\\chromedriver.exe";
     public static final String IMAGE_FOLDER = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap";
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(BrowserAction.class);
 
     private static final BrowserAction browserAction = new BrowserAction();
 
@@ -37,18 +42,19 @@ public class BrowserAction {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
+                LOGGER.error("Captcha Should Be Entered Manually...");
                 throw new RuntimeException(e);
             }
             urlLoop:
             for (String url : urls) {
                 try {
-                    System.out.println("*** Product URL: " + url + " ***");
+                    LOGGER.info("*** Product URL: " + url + " ***");
                     driver.get(url);
                     String productName = "";
                     try {
                         productName = driver.findElement(By.id("titleSection")).getText();
                     } catch (NoSuchElementException e) {
-                        System.out.println("There is no PRODUCT NAME for this product...");
+                        LOGGER.info("There is no PRODUCT NAME for this product...");
                     }
                     String description = "";
                     String cost = "";
@@ -56,19 +62,19 @@ public class BrowserAction {
                     try {
                         description = driver.findElement(By.id("feature-bullets")).getText();
                     } catch (NoSuchElementException e) {
-                        System.out.println("There is no DESCRIPTION for this product...");
+                        LOGGER.info("There is no DESCRIPTION for this product...");
                     }
                     try {
                         WebElement brandElement = driver.findElement(By.cssSelector("tr.a-spacing-small.po-brand span.a-size-base.po-break-word"));
                         brand = brandElement.getText();
                     } catch (NoSuchElementException e) {
-                        System.out.println("There is no BRAND for this product...");
+                        LOGGER.info("There is no BRAND for this product...");
                     }
                     try {
                         WebElement priceElement = driver.findElement(By.cssSelector("span.a-price.a-text-price"));
                         cost = priceElement.getText();
                     } catch (NoSuchElementException e) {
-                        System.out.println("There is no PRICE for this product...");
+                        LOGGER.info("There is no PRICE for this product...");
                     }
                     String asinValue = "";
                     String company = "";
@@ -116,14 +122,14 @@ public class BrowserAction {
                             .build();
                     productsList.add(product);
                 } catch (NoSuchElementException e) {
-                    System.out.println("ASIN/COUNTRY OF ORIGIN/MANUFACTURER Missing...");
+                    LOGGER.info("ASIN/COUNTRY OF ORIGIN/MANUFACTURER Missing...");
                     continue urlLoop;
                 }
             }
         } finally {
             driver.quit();
             int size = productsList.size();
-            System.out.println("Last successful product scraped: " + productsList.get(size - 1).getProductName() + " ASIN:" + productsList.get(size - 1).getASIN());
+            LOGGER.info("Last successful product scraped: " + productsList.get(size - 1).getProductName() + " ASIN:" + productsList.get(size - 1).getASIN());
             return productsList;
         }
 
@@ -143,19 +149,21 @@ public class BrowserAction {
                     URL imgUrl = new URL(imageUrl);
                     Path destination = Path.of(IMAGE_FOLDER, "image_" + ASIN + "_" + i + ".jpg");
                     Files.copy(imgUrl.openStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("Downloaded image " + i + " to " + destination.toString());
+                    LOGGER.info("Downloaded image " + i + " to " + destination.toString());
                 }
 
             } catch (MalformedURLException e) {
+                LOGGER.warn("No Such URL available...");
                 throw new RuntimeException(e);
             } catch (IOException e) {
+                LOGGER.error("I/O exception...");
                 throw new RuntimeException(e);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchElementException e) {
-                System.out.println("No more images available for this product...");
+                LOGGER.info("No More Images Available For This Product...");
             } catch (ElementNotInteractableException e){
-                System.out.println("Catched the exception, continue...");
+                LOGGER.info("Continue To Search For Product Images...");
             }
         }
     }
