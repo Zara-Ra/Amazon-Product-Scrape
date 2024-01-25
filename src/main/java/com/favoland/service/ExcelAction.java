@@ -23,7 +23,7 @@ public class ExcelAction {
         return EXCEL_ACTION;
     }
 
-    public static final String URL_LIST = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap\\Testt.xlsx";
+    public static final String URL_LIST = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap\\Test.xlsx";
     public static final String SCRAPE_PRODUCT_FILE_PATH = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap\\ScrapedTest.xlsx";
 
     public List<String> readURLs(){
@@ -74,6 +74,7 @@ public class ExcelAction {
                 row.createCell(2).setCellValue(product.getCompany());
                 row.createCell(3).setCellValue(product.getCost());
                 row.createCell(4).setCellValue(product.getASIN());
+                row.createCell(5).setCellValue(product.getUPC());
                 row.createCell(6).setCellValue(product.getDescription());
                 row.createCell(7).setCellValue(product.getCountryOfOrigin());
                 row.createCell(8).setCellValue(product.getURL());

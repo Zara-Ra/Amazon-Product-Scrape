@@ -1,9 +1,9 @@
 package com.favoland.service;
 
 import com.favoland.data.AmazonProduct;
-import com.favoland.run.Robot;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 
@@ -26,6 +28,35 @@ public class BrowserAction {
 
     private static final BrowserAction browserAction = new BrowserAction();
 
+    List<String> userAgents = Arrays.asList(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.48",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+
     private BrowserAction() {
     }
 
@@ -36,9 +67,9 @@ public class BrowserAction {
     public List<AmazonProduct> browseSingleProductPages(List<String> urls) {
         List<AmazonProduct> productsList = new ArrayList<>();
         System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_PATH);
-        WebDriver driver = new ChromeDriver();
+        WebDriver initialDriver = new ChromeDriver();
         try {
-            driver.get(urls.get(0));
+            initialDriver.get(urls.get(0));
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
@@ -47,6 +78,8 @@ public class BrowserAction {
             }
             urlLoop:
             for (String url : urls) {
+
+                WebDriver driver = createDriverWithRandomUserAgent(userAgents);
                 try {
                     LOGGER.info("*** Product URL: " + url + " ***");
                     driver.get(url);
@@ -79,6 +112,7 @@ public class BrowserAction {
                     String asinValue = "";
                     String company = "";
                     String countryOfOrigin = "";
+                    String upc = "";
                     try {
                         WebElement detailBulletsDiv = driver.findElement(By.id("detailBullets_feature_div"));
                         List<WebElement> listItems = detailBulletsDiv.findElements(By.cssSelector("ul.detail-bullet-list > li"));
@@ -94,6 +128,10 @@ public class BrowserAction {
                             } else if (listItemText.contains("Country of origin")) {
                                 String[] split = listItemText.split(":");
                                 countryOfOrigin = split[1];
+                            }else if (listItemText.contains("UPC")) {
+                                String[] split = listItemText.split(":");
+                                upc = split[1];
+
                             }
                         }
                     } catch (NoSuchElementException e) {
@@ -106,6 +144,9 @@ public class BrowserAction {
                             } else if (row.getText().contains("Manufacturer")) {
                                 String[] s = cells.get(0).getText().split(" ");
                                 company = s[0];
+                            }else if (row.getText().contains("UPC")) {
+                                String[] s = cells.get(0).getText().split(" ");
+                                upc = s[0];
                             }
                         }
                     }
@@ -117,6 +158,7 @@ public class BrowserAction {
                             .brand(brand)
                             .description(description)
                             .countryOfOrigin(countryOfOrigin)
+                            .UPC(upc)
                             .URL(url)
                             .cost(cost)
                             .build();
@@ -124,18 +166,81 @@ public class BrowserAction {
                 } catch (NoSuchElementException e) {
                     LOGGER.info("ASIN/COUNTRY OF ORIGIN/MANUFACTURER Missing...");
                     continue urlLoop;
+                } finally {
+                    driver.quit();
                 }
             }
         } finally {
-            driver.quit();
             int size = productsList.size();
             LOGGER.info("Last successful product scraped: " + productsList.get(size - 1).getProductName() + " ASIN:" + productsList.get(size - 1).getASIN());
             return productsList;
         }
+    }
 
+    private static WebDriver createDriverWithRandomUserAgent(List<String> userAgents) {
+        // Choose a random User-Agent from the list
+        String randomUserAgent = getRandomUserAgent(userAgents);
+
+        // Set up ChromeOptions
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless"); // Optional: Run Chrome in headless mode
+        options.addArguments("user-agent=" + randomUserAgent);
+
+        // Create WebDriver with ChromeOptions
+        return new ChromeDriver(options);
+    }
+
+    private static String getRandomUserAgent(List<String> userAgents) {
+        // Choose a random index from the list
+        int randomIndex = new Random().nextInt(userAgents.size());
+
+        // Get the User-Agent at the random index
+        return userAgents.get(randomIndex);
+    }
+
+    public void browseUrlForImage(List<String> urls) {
+        System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_PATH);
+        WebDriver driver = new ChromeDriver();
+        try {
+            driver.get(urls.get(0));
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                LOGGER.error("Captcha Should Be Entered Manually...");
+                throw new RuntimeException(e);
+            }
+            int count = 1;
+            urlLoop:
+            for (String url : urls) {
+                Thread.sleep(2000);
+                count++;
+                try {
+                    driver.get(url);
+                    String asinValue = "";
+                    WebElement detailBulletsDiv = driver.findElement(By.id("detailBullets_feature_div"));
+                    List<WebElement> listItems = detailBulletsDiv.findElements(By.cssSelector("ul.detail-bullet-list > li"));
+                    for (WebElement listItem : listItems) {
+                        String listItemText = listItem.getText().trim();
+                        if (listItemText.contains("ASIN")) {
+                            String[] split = listItemText.split(":");
+                            asinValue = split[1];
+                            break;
+                        }
+                    }
+                    LOGGER.info(count + asinValue + " *** Product URL: " + url);
+                    saveProductImages(driver, asinValue);
+                } catch (NoSuchElementException e) {
+                }
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            driver.quit();
+        }
     }
 
     public void saveProductImages(WebDriver driver, String ASIN) {
+        int imgCount = 0;
         for (int i = 5; i < 13; i++) {
             try {
                 WebElement element = driver.findElement(By.cssSelector("input[aria-labelledby='a-autoid-" + i + "-announce']"));
@@ -143,14 +248,16 @@ public class BrowserAction {
                 element.click();
                 TimeUnit.SECONDS.sleep(2);
 
-                WebElement imageElement = driver.findElement(By.id("landingImage"));
-                String imageUrl = imageElement.getAttribute("src");
+                WebElement liElement = driver.findElement(By.cssSelector("li.image.item.itemNo"+imgCount+".maintain-height.selected"));
+                WebElement imgElement = liElement.findElement(By.cssSelector("img.a-dynamic-image"));
+                String imageUrl = imgElement.getAttribute("src");
                 if (imageUrl != null) {
                     URL imgUrl = new URL(imageUrl);
-                    Path destination = Path.of(IMAGE_FOLDER, "image_" + ASIN + "_" + i + ".jpg");
+                    Path destination = Path.of(IMAGE_FOLDER, "image_" + ASIN + "_" + imgCount + ".jpg");
                     Files.copy(imgUrl.openStream(), destination, StandardCopyOption.REPLACE_EXISTING);
                     LOGGER.info("Downloaded image " + i + " to " + destination.toString());
                 }
+                imgCount++;
 
             } catch (MalformedURLException e) {
                 LOGGER.warn("No Such URL available...");
@@ -162,7 +269,7 @@ public class BrowserAction {
                 throw new RuntimeException(e);
             } catch (NoSuchElementException e) {
                 LOGGER.info("No More Images Available For This Product...");
-            } catch (ElementNotInteractableException e){
+            } catch (ElementNotInteractableException e) {
                 LOGGER.info("Continue To Search For Product Images...");
             }
         }
