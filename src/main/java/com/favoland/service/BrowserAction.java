@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -22,13 +21,14 @@ import java.util.concurrent.TimeUnit;
 
 public class BrowserAction {
     private static final String CHROME_DRIVER_PATH = "Driver\\chromedriver.exe";
-    public static final String IMAGE_FOLDER = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap";
+    public static final String IMAGE_FOLDER = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap\\HandSoap.1.Images";
 
     public static final Logger LOGGER = LoggerFactory.getLogger(BrowserAction.class);
 
     private static final BrowserAction browserAction = new BrowserAction();
+    private final UserAgentGenerator userAgentGenerator = new UserAgentGenerator();
 
-    List<String> userAgents = Arrays.asList(
+    /*List<String> userAgents = Arrays.asList(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.48",
@@ -55,7 +55,7 @@ public class BrowserAction {
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");*/
 
     private BrowserAction() {
     }
@@ -76,12 +76,13 @@ public class BrowserAction {
                 LOGGER.error("Captcha Should Be Entered Manually...");
                 throw new RuntimeException(e);
             }
+            initialDriver.quit();
+            int count = 1;
             urlLoop:
             for (String url : urls) {
-
-                WebDriver driver = createDriverWithRandomUserAgent(userAgents);
+                WebDriver driver = createDriverWithRandomUserAgent();
                 try {
-                    LOGGER.info("*** Product URL: " + url + " ***");
+
                     driver.get(url);
                     String productName = "";
                     try {
@@ -128,7 +129,7 @@ public class BrowserAction {
                             } else if (listItemText.contains("Country of origin")) {
                                 String[] split = listItemText.split(":");
                                 countryOfOrigin = split[1];
-                            }else if (listItemText.contains("UPC")) {
+                            } else if (listItemText.contains("UPC")) {
                                 String[] split = listItemText.split(":");
                                 upc = split[1];
 
@@ -144,12 +145,14 @@ public class BrowserAction {
                             } else if (row.getText().contains("Manufacturer")) {
                                 String[] s = cells.get(0).getText().split(" ");
                                 company = s[0];
-                            }else if (row.getText().contains("UPC")) {
+                            } else if (row.getText().contains("UPC")) {
                                 String[] s = cells.get(0).getText().split(" ");
                                 upc = s[0];
                             }
                         }
                     }
+                    LOGGER.info(count + asinValue + " *** Product URL: " + url);
+                    count++;
                     saveProductImages(driver, asinValue);
                     AmazonProduct product = AmazonProduct.builder()
                             .ASIN(asinValue)
@@ -177,23 +180,17 @@ public class BrowserAction {
         }
     }
 
-    private static WebDriver createDriverWithRandomUserAgent(List<String> userAgents) {
-        String randomUserAgent = getRandomUserAgent(userAgents);
+    private WebDriver createDriverWithRandomUserAgent() {
+        String userAgent = userAgentGenerator.generateRandomUserAgent(new Random());
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("user-agent=" + randomUserAgent);
-
+        options.addArguments("user-agent=" + userAgent);
+        options.addArguments("--headless");
         return new ChromeDriver(options);
-    }
-
-    private static String getRandomUserAgent(List<String> userAgents) {
-        int randomIndex = new Random().nextInt(userAgents.size());
-        return userAgents.get(randomIndex);
     }
 
     public void browseUrlForImage(List<String> urls) {
         System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_PATH);
-        //WebDriver driver = new ChromeDriver();
-        WebDriver driver = createDriverWithRandomUserAgent(userAgents);
+        WebDriver driver = createDriverWithRandomUserAgent();
         try {
             driver.get(urls.get(0));
             try {
@@ -241,14 +238,14 @@ public class BrowserAction {
                 element.click();
                 TimeUnit.SECONDS.sleep(2);
 
-                WebElement liElement = driver.findElement(By.cssSelector("li.image.item.itemNo"+imgCount+".maintain-height.selected"));
+                WebElement liElement = driver.findElement(By.cssSelector("li.image.item.itemNo" + imgCount + ".maintain-height.selected"));
                 WebElement imgElement = liElement.findElement(By.cssSelector("img.a-dynamic-image"));
                 String imageUrl = imgElement.getAttribute("src");
                 if (imageUrl != null) {
                     URL imgUrl = new URL(imageUrl);
                     Path destination = Path.of(IMAGE_FOLDER, "image_" + ASIN + "_" + imgCount + ".jpg");
                     Files.copy(imgUrl.openStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-                    LOGGER.info("Downloaded image " + i + " to " + destination.toString());
+                    LOGGER.info("Downloaded image " + i + " to " + destination);
                 }
                 imgCount++;
 

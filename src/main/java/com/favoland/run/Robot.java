@@ -17,10 +17,10 @@ public class Robot {
         long startTime = System.currentTimeMillis();
 
         List<String> urls = excelAction.readURLs();
-        browserAction.browseUrlForImage(urls);
-        //List<AmazonProduct> products = browserAction.browseSingleProductPages(urls);
-        //excelAction.writeProductsInExcelSheet(products);
-        //System.out.println("#" + products.size() + " Products Scraped");
+        //browserAction.browseUrlForImage(urls);
+        List<AmazonProduct> products = browserAction.browseSingleProductPages(urls);
+        excelAction.writeProductsInExcelSheet(products);
+        System.out.println("#" + products.size() + " Products Scraped");
 
         long finishTime = System.currentTimeMillis();
         long duration = finishTime - startTime;
