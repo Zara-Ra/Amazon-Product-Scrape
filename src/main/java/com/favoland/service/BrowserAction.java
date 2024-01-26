@@ -178,33 +178,26 @@ public class BrowserAction {
     }
 
     private static WebDriver createDriverWithRandomUserAgent(List<String> userAgents) {
-        // Choose a random User-Agent from the list
         String randomUserAgent = getRandomUserAgent(userAgents);
-
-        // Set up ChromeOptions
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless"); // Optional: Run Chrome in headless mode
         options.addArguments("user-agent=" + randomUserAgent);
 
-        // Create WebDriver with ChromeOptions
         return new ChromeDriver(options);
     }
 
     private static String getRandomUserAgent(List<String> userAgents) {
-        // Choose a random index from the list
         int randomIndex = new Random().nextInt(userAgents.size());
-
-        // Get the User-Agent at the random index
         return userAgents.get(randomIndex);
     }
 
     public void browseUrlForImage(List<String> urls) {
         System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_PATH);
-        WebDriver driver = new ChromeDriver();
+        //WebDriver driver = new ChromeDriver();
+        WebDriver driver = createDriverWithRandomUserAgent(userAgents);
         try {
             driver.get(urls.get(0));
             try {
-                Thread.sleep(10000);
+                Thread.sleep(7000);
             } catch (InterruptedException e) {
                 LOGGER.error("Captcha Should Be Entered Manually...");
                 throw new RuntimeException(e);
@@ -212,7 +205,7 @@ public class BrowserAction {
             int count = 1;
             urlLoop:
             for (String url : urls) {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
                 count++;
                 try {
                     driver.get(url);
