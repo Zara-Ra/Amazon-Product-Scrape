@@ -264,4 +264,66 @@ public class BrowserAction {
             }
         }
     }
+
+    public void getIngredientsFromUrl(List<String> urls) {
+        System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_PATH);
+        WebDriver initialDriver = new ChromeDriver();
+        initialDriver.get(urls.get(0));
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            LOGGER.error("Captcha Should Be Entered Manually...");
+            throw new RuntimeException(e);
+        }
+        initialDriver.quit();
+        int count = 2;
+        for (String url : urls) {
+            LOGGER.info(count + " "+ url);
+            WebDriver driver = createDriverWithRandomUserAgent();
+            try {
+                driver.get(url);
+                List<WebElement> contentSections = driver.findElements(By.cssSelector(".a-section.content"));
+
+                for (WebElement contentSection : contentSections) {
+                    WebElement ingredientsHeader = contentSection.findElement(By.tagName("h4"));
+                    if (ingredientsHeader.getText().contains("Ingredients")) {
+                        LOGGER.info("Ingredients section found...");
+                        WebElement ingredientsParagraph = findFirstNonEmptyParagraphAfterHeader(ingredientsHeader);
+                        if (ingredientsParagraph != null) {
+                            String ingredientsText = ingredientsParagraph.getText();
+                            ExcelAction.writeIngredients(url, ingredientsText);
+                            LOGGER.info("Ingredients added to excel file...");
+                        }
+                        break;
+                    }
+                }
+
+
+            } catch (NoSuchElementException e) {
+                LOGGER.info("There is no Ingredient section for this product...");
+            }
+            driver.quit();
+            count++;
+        }
+    }
+
+    private static WebElement findFirstNonEmptyParagraphAfterHeader(WebElement header) {
+        WebElement parentElement = header.findElement(By.xpath(".."));
+        return parentElement.findElements(By.tagName("p"))
+                .stream()
+                .filter(p -> !p.getText().trim().isEmpty())
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static void main(String[] args) {
+        List<String> url = new ArrayList<>();
+        url.add("https://www.amazon.com/Dove-Hypoallergenic-Paraben-Free-Sulfate-Free-Cruelty-Free/dp/B0BVBYQGTW/");
+        url.add("https://www.amazon.com/Beauty-Moisturizing-Effectively-Bacteria-Nourishes/dp/B086K2KMNR/");
+        url.add("https://www.amazon.com/Dove-Beauty-Bar-Shea-Butter/dp/B002TSA93Y/");
+        url.add("https://www.amazon.com/Dove-Beauty-Bar-Coconut-Milk/dp/B00IOVOCFQ/");
+        url.add("https://www.amazon.com/Beauty-Moisturizing-Exfoliating-Cleanser-Smoother/dp/B084PKK1CZ/");
+        BrowserAction.getInstance().getIngredientsFromUrl(url);
+    }
 }
+

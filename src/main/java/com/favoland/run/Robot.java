@@ -16,11 +16,21 @@ public class Robot {
 
         long startTime = System.currentTimeMillis();
 
-        List<String> urls = excelAction.readURLs();
+
+
+        //To scrape the images from urls
+        //List<String> urls = excelAction.readURLs(0);//use URL_LIST in ExcelAction
         //browserAction.browseUrlForImage(urls);
-        List<AmazonProduct> products = browserAction.browseSingleProductPages(urls);
+
+        //To scrape data from urls
+        //List<String> urls = excelAction.readURLs(0);//use URL_LIST in ExcelAction
+        /*List<AmazonProduct> products = browserAction.browseSingleProductPages(urls);
         excelAction.writeProductsInExcelSheet(products);
-        System.out.println("#" + products.size() + " Products Scraped");
+        System.out.println("#" + products.size() + " Products Scraped");*/
+
+        //To scrape ingredients
+        List<String> urls = excelAction.readURLs(11);
+        browserAction.getIngredientsFromUrl(urls);
 
         long finishTime = System.currentTimeMillis();
         long duration = finishTime - startTime;

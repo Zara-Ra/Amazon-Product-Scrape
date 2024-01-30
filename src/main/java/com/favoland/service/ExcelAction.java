@@ -1,10 +1,7 @@
 package com.favoland.service;
 
 import com.favoland.data.AmazonProduct;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
@@ -23,13 +20,39 @@ public class ExcelAction {
         return EXCEL_ACTION;
     }
 
-    public static final String URL_LIST = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap\\HandSoap.1.xlsx";
-    public static final String SCRAPE_PRODUCT_FILE_PATH = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap\\ScrapedData.HandSoap.1.xlsx";
 
-    public List<String> readURLs(){
+    public static final String URL_LIST = "C:\\Users\\Hosseini\\Desktop\\FAVOLAND\\UiPath\\HandSoap\\HandSoap.1.xlsx";
+    public static final String SCRAPE_PRODUCT_FILE_PATH = "C:\\Users\\Hosseini\\Desktop\\FAVOLAND\\UiPath\\HandSoap\\ScrapedData.HandSoap.1.xlsx";
+
+    public static final String ALL_PRODUCTS_LIST = "C:\\Users\\Hosseini\\Desktop\\FAVOLAND\\Amazon.xlsx";
+
+    public static void writeIngredients(String url, String ingredientsText) {
+        try (FileInputStream fileInputStream = new FileInputStream(ALL_PRODUCTS_LIST);
+             Workbook workbook = new XSSFWorkbook(fileInputStream)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            for (Row row : sheet) {
+                Cell urlCell = row.getCell(11);
+                if (urlCell != null && urlCell.getCellType() == CellType.STRING
+                        && urlCell.getStringCellValue().equals(url)) {
+                    Cell ingredientsCell = row.createCell(10);
+                    ingredientsCell.setCellValue(ingredientsText);
+                    break;
+                }
+            }
+            try (FileOutputStream fileOutputStream = new FileOutputStream(ALL_PRODUCTS_LIST)) {
+                workbook.write(fileOutputStream);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public List<String> readURLs(int column){
         List<String> allURLs = new ArrayList<>();
         try {
-            FileInputStream fileInputStream = new FileInputStream(URL_LIST);
+            FileInputStream fileInputStream = new FileInputStream(ALL_PRODUCTS_LIST);
             Workbook workbook = new XSSFWorkbook(fileInputStream);
             fileInputStream.close();
             Sheet sheet = workbook.getSheetAt(0);
@@ -38,7 +61,7 @@ public class ExcelAction {
                 Row row = sheet.getRow(rowNum);
                 if(row == null)
                     continue;
-                Cell amountCell = row.getCell(0);
+                Cell amountCell = row.getCell(column);
 
                 String URL = amountCell.getStringCellValue();
                 allURLs.add(URL);
