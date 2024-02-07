@@ -29,8 +29,8 @@ public class Robot {
         System.out.println("#" + products.size() + " Products Scraped");*/
 
         //To scrape ingredients
-        List<String> urls = excelAction.readURLs(11);
-        browserAction.getIngredientsFromUrl(urls);
+        List<String> urls = excelAction.readURLs(11,18145,2000);
+        browserAction.getIngredientsFromUrl(urls,18145);
 
         long finishTime = System.currentTimeMillis();
         long duration = finishTime - startTime;

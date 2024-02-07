@@ -265,20 +265,19 @@ public class BrowserAction {
         }
     }
 
-    public void getIngredientsFromUrl(List<String> urls) {
+    public void getIngredientsFromUrl(List<String> urls,int startRow) {
         System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_PATH);
-        WebDriver initialDriver = new ChromeDriver();
-        initialDriver.get(urls.get(0));
+
+        /*initialDriver.get(urls.get(0));
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
             LOGGER.error("Captcha Should Be Entered Manually...");
             throw new RuntimeException(e);
         }
-        initialDriver.quit();
-        int count = 2;
+        initialDriver.quit();*/
         for (String url : urls) {
-            LOGGER.info(count + " "+ url);
+            LOGGER.info(startRow + ": "+ url);
             WebDriver driver = createDriverWithRandomUserAgent();
             try {
                 driver.get(url);
@@ -302,9 +301,11 @@ public class BrowserAction {
             } catch (NoSuchElementException e) {
                 LOGGER.info("There is no Ingredient section for this product...");
             }
+            startRow++;
             driver.quit();
-            count++;
         }
+
+
     }
 
     private static WebElement findFirstNonEmptyParagraphAfterHeader(WebElement header) {
@@ -323,7 +324,7 @@ public class BrowserAction {
         url.add("https://www.amazon.com/Dove-Beauty-Bar-Shea-Butter/dp/B002TSA93Y/");
         url.add("https://www.amazon.com/Dove-Beauty-Bar-Coconut-Milk/dp/B00IOVOCFQ/");
         url.add("https://www.amazon.com/Beauty-Moisturizing-Exfoliating-Cleanser-Smoother/dp/B084PKK1CZ/");
-        BrowserAction.getInstance().getIngredientsFromUrl(url);
+        //BrowserAction.getInstance().getIngredientsFromUrl(url);
     }
 }
 

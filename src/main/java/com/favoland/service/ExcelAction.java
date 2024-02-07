@@ -24,7 +24,7 @@ public class ExcelAction {
     public static final String URL_LIST = "C:\\Users\\Hosseini\\Desktop\\FAVOLAND\\UiPath\\HandSoap\\HandSoap.1.xlsx";
     public static final String SCRAPE_PRODUCT_FILE_PATH = "C:\\Users\\Hosseini\\Desktop\\FAVOLAND\\UiPath\\HandSoap\\ScrapedData.HandSoap.1.xlsx";
 
-    public static final String ALL_PRODUCTS_LIST = "C:\\Users\\Hosseini\\Desktop\\FAVOLAND\\Amazon.xlsx";
+    public static final String ALL_PRODUCTS_LIST = "C:\\Users\\Hosseini\\Desktop\\FAVOLAND\\Amazon 1 Feb.xlsx";
 
     public static void writeIngredients(String url, String ingredientsText) {
         try (FileInputStream fileInputStream = new FileInputStream(ALL_PRODUCTS_LIST);
@@ -45,11 +45,12 @@ public class ExcelAction {
 
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(0);
         }
     }
 
 
-    public List<String> readURLs(int column){
+    public List<String> readURLs(int urlColumn,int startRow,int numOfUrls){
         List<String> allURLs = new ArrayList<>();
         try {
             FileInputStream fileInputStream = new FileInputStream(ALL_PRODUCTS_LIST);
@@ -57,11 +58,13 @@ public class ExcelAction {
             fileInputStream.close();
             Sheet sheet = workbook.getSheetAt(0);
 
-            for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+            //for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+            int finishRow = startRow + numOfUrls;
+            for (int rowNum = startRow; rowNum <= finishRow; rowNum++) {
                 Row row = sheet.getRow(rowNum);
                 if(row == null)
                     continue;
-                Cell amountCell = row.getCell(column);
+                Cell amountCell = row.getCell(urlColumn);
 
                 String URL = amountCell.getStringCellValue();
                 allURLs.add(URL);
