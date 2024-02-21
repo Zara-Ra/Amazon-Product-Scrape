@@ -1,11 +1,12 @@
 package com.favoland.service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class UserAgentGenerator {
 
-    public  List<String> generateUserAgents(int count) {
+    public List<String> generateUserAgents(int count) {
         List<String> userAgents = new ArrayList<>();
         Random random = new Random();
 
@@ -17,7 +18,7 @@ public class UserAgentGenerator {
         return userAgents;
     }
 
-    public  String generateRandomUserAgent(Random random) {
+    public String generateRandomUserAgent(Random random) {
         String[] browsers = {"Chrome", "Firefox", "Safari", "Edge", "Opera"};
         String[] os = {"Windows NT 10.0", "Macintosh", "Linux"};
 

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BrowserAction {
     private static final String CHROME_DRIVER_PATH = "Driver\\chromedriver.exe";
-    public static final String IMAGE_FOLDER = "C:\\Users\\Hosseini\\Desktop\\Favoland Jeff\\UiPath\\HandSoap\\HandSoap.1.Images";
+    public static final String IMAGE_FOLDER = "PATH TO SAVE IMAGES";
 
     public static final Logger LOGGER = LoggerFactory.getLogger(BrowserAction.class);
 
@@ -265,17 +265,9 @@ public class BrowserAction {
         }
     }
 
-    public void getIngredientsFromUrl(List<String> urls,int startRow) {
+    public void getIngredientsFromUrl(List<String> urls,int startRow){
         System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_PATH);
 
-        /*initialDriver.get(urls.get(0));
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            LOGGER.error("Captcha Should Be Entered Manually...");
-            throw new RuntimeException(e);
-        }
-        initialDriver.quit();*/
         for (String url : urls) {
             LOGGER.info(startRow + ": "+ url);
             WebDriver driver = createDriverWithRandomUserAgent();
@@ -315,16 +307,6 @@ public class BrowserAction {
                 .filter(p -> !p.getText().trim().isEmpty())
                 .findFirst()
                 .orElse(null);
-    }
-
-    public static void main(String[] args) {
-        List<String> url = new ArrayList<>();
-        url.add("https://www.amazon.com/Dove-Hypoallergenic-Paraben-Free-Sulfate-Free-Cruelty-Free/dp/B0BVBYQGTW/");
-        url.add("https://www.amazon.com/Beauty-Moisturizing-Effectively-Bacteria-Nourishes/dp/B086K2KMNR/");
-        url.add("https://www.amazon.com/Dove-Beauty-Bar-Shea-Butter/dp/B002TSA93Y/");
-        url.add("https://www.amazon.com/Dove-Beauty-Bar-Coconut-Milk/dp/B00IOVOCFQ/");
-        url.add("https://www.amazon.com/Beauty-Moisturizing-Exfoliating-Cleanser-Smoother/dp/B084PKK1CZ/");
-        //BrowserAction.getInstance().getIngredientsFromUrl(url);
     }
 }
 

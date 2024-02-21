@@ -50,7 +50,7 @@ public class ExcelAction {
     }
 
 
-    public List<String> readURLs(int urlColumn,int startRow,int numOfUrls){
+    public List<String> readURLs(int urlColumn, int startRow, int numOfUrls) {
         List<String> allURLs = new ArrayList<>();
         try {
             FileInputStream fileInputStream = new FileInputStream(ALL_PRODUCTS_LIST);
@@ -62,7 +62,7 @@ public class ExcelAction {
             int finishRow = startRow + numOfUrls;
             for (int rowNum = startRow; rowNum <= finishRow; rowNum++) {
                 Row row = sheet.getRow(rowNum);
-                if(row == null)
+                if (row == null)
                     continue;
                 Cell amountCell = row.getCell(urlColumn);
 
